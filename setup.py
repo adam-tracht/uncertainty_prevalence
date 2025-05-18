@@ -1,6 +1,4 @@
-""
-Package configuration for the Economic Uncertainty Analysis project.
-"""
+"""Package configuration for the Economic Uncertainty Analysis project."""
 from setuptools import find_packages, setup
 
 with open("README.md", "r", encoding="utf-8") as fh:
@@ -23,17 +21,13 @@ setup(
     ],
     python_requires=">=3.9",
     install_requires=[
-        # Core
         "python-dotenv>=1.0.0",
-        # Data Processing
         "pandas>=1.5.0",
         "numpy>=1.21.0",
         "python-dateutil>=2.8.2",
-        # API Client
         "requests>=2.28.0",
         "requests-cache>=1.0.0",
         "ratelimit>=2.2.1",
-        # Web Framework
         "fastapi>=0.95.0",
         "uvicorn>=0.21.0",
         "pydantic>=1.10.5",
