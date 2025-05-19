@@ -15,7 +15,7 @@ const SmoothingControl: React.FC<SmoothingControlProps> = ({
   onSmoothingChange,
 }) => {
   return (
-    <div className="absolute top-2 right-2 z-10 bg-white dark:bg-gray-800 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 p-1">
+    <div className="bg-white dark:bg-gray-800 rounded-md shadow-sm border border-gray-200 dark:border-gray-700 p-1">
       <div className="flex items-center space-x-1">
         <span className="text-xs text-gray-500 dark:text-gray-400 mr-1">Smoothing:</span>
         {[1, 7, 14, 30].map(days => (

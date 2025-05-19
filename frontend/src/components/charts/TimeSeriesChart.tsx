@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import {
   Chart as ChartJS,
   CategoryScale,
@@ -44,7 +44,7 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
   data,
   smoothingDays = 7,
   onSmoothingChange,
-  height = 300,
+  height = 500, // Increased from 300 to 400 for better trend visibility
   showLegend = true,
   isLoading = false,
   showSmoothingControl = false,
@@ -75,8 +75,8 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
         borderColor: 'rgb(59, 130, 246)', // Tailwind blue-500
         backgroundColor: 'rgba(59, 130, 246, 0.5)',
         borderWidth: 2,
-        pointRadius: 3,
-        pointHoverRadius: 5,
+        pointRadius: 0, // Remove circles for data points
+        pointHoverRadius: 5, // Keep circles visible on hover
         tension: 0.3, // Slight curve for better visualization
       },
     ],
@@ -90,6 +90,10 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
       legend: {
         display: showLegend,
         position: 'top' as const,
+        // Add padding to the legend to prevent overlap with the smoothing control
+        labels: {
+          padding: showSmoothingControl ? 20 : 10,
+        },
       },
       tooltip: {
         mode: 'index',
@@ -109,6 +113,11 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
         ticks: {
           maxRotation: 45,
           minRotation: 45,
+          padding: 8, // Add padding to prevent overflow
+        },
+        // Add bottom padding to ensure labels don't overflow
+        afterFit: (scale) => {
+          scale.paddingBottom = 15;
         },
       },
       y: {
@@ -144,15 +153,43 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
     );
   }
 
+  // Calculate the chart height, with responsive sizing
+  // Use a smaller height on mobile devices
+  const [chartHeight, setChartHeight] = useState(height);
+  
+  // Effect to handle responsive height changes
+  useEffect(() => {
+    const handleResize = () => {
+      // Check if we're on a mobile device (screen width < 640px, Tailwind's sm breakpoint)
+      const isMobile = window.innerWidth < 640;
+      // Set height to 400px on mobile, otherwise use the provided height
+      setChartHeight(isMobile ? Math.min(400, height) : height);
+    };
+    
+    // Set initial height
+    handleResize();
+    
+    // Add resize listener
+    window.addEventListener('resize', handleResize);
+    
+    // Clean up
+    return () => window.removeEventListener('resize', handleResize);
+  }, [height]);
+  
   return (
-    <div style={{ height: `${height}px` }} className="relative">
-      {showSmoothingControl && onSmoothingChange && (
-        <SmoothingControl 
-          smoothingDays={smoothingDays} 
-          onSmoothingChange={onSmoothingChange} 
-        />
-      )}
-      <Line data={chartData} options={options} />
+    <div className="relative px-0 sm:px-6 md:px-10">
+      <div style={{ height: `${chartHeight}px` }} className="relative">
+        {/* Position the smoothing control absolutely on desktop, but keep it in normal flow on mobile */}
+        {showSmoothingControl && onSmoothingChange && (
+          <div className="block sm:absolute sm:top-0 sm:right-0 sm:z-10 mb-2 sm:mb-0">
+            <SmoothingControl 
+              smoothingDays={smoothingDays} 
+              onSmoothingChange={onSmoothingChange} 
+            />
+          </div>
+        )}
+        <Line data={chartData} options={options} />
+      </div>
     </div>
   );
 };

@@ -82,7 +82,7 @@ const Dashboard = () => {
               smoothingDays={smoothingDays}
               onSmoothingChange={setSmoothingDays}
               showSmoothingControl={true}
-              height={350}
+              height={500}
             />
           )}
         </div>
