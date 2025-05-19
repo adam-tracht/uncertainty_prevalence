@@ -1,0 +1,38 @@
+name: Update Uncertainty Data
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'  # Run weekly on Sundays at midnight
+  workflow_dispatch:  # Allow manual triggers
+
+jobs:
+  update-data:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+          
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          
+      - name: Run analysis for past week
+        run: |
+          python scripts/analyze_uncertainty.py --days 7 --visualize
+          
+      - name: Aggregate results
+        run: |
+          python scripts/aggregate_outputs.py
+          
+      - name: Commit and push if changes
+        run: |
+          git config --global user.name 'GitHub Actions Bot'
+          git config --global user.email 'actions@github.com'
+          git add frontend/public/data/output/
+          git commit -m "Update data files" || exit 0
+          git push

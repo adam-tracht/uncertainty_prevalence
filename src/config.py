@@ -1,10 +1,9 @@
-""
-Configuration settings for the Economic Uncertainty Analysis project.
-"""
+"""Configuration settings for the Economic Uncertainty Analysis project."""
 import os
 from pathlib import Path
 from typing import Dict, List, Optional
-from pydantic import BaseSettings, HttpUrl, validator
+from pydantic import HttpUrl, validator
+from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
@@ -24,8 +23,8 @@ class Settings(BaseSettings):
     REQUESTS_PER_MINUTE: int = 10  # GDELT rate limit is typically 10-15 RPM
     
     # Data collection
-    DEFAULT_START_DATE: str = "2024-01-01"
-    DEFAULT_END_DATE: str = "2024-12-31"
+    DEFAULT_START_DATE: str = "2024-05-01"
+    DEFAULT_END_DATE: str = "2025-05-18"
     
     # News sources (from planning.md)
     NEWS_SOURCES: Dict[str, List[str]] = {

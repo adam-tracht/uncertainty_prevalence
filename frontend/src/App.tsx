@@ -1,6 +1,6 @@
 import { Suspense, lazy } from 'react';
 
-// Layout components
+// Layout component
 import Layout from './components/layout/Layout';
 
 // Main dashboard component
