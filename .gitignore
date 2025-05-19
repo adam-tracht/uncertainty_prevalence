@@ -23,6 +23,10 @@ wheels/
 # Frontend
 frontend/node_modules/
 frontend/dist/
+!frontend/dist/data/
+!frontend/dist/data/output/
+!frontend/dist/data/output/*.json
+!frontend/dist/data/output/*.csv
 frontend/.vite/
 
 # Virtual Environment
