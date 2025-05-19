@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { InformationCircleIcon } from '@heroicons/react/24/outline';
 
 /**
  * MethodologyInfo component
@@ -15,7 +16,10 @@ const MethodologyInfo: React.FC = () => {
         className="p-4 flex justify-between items-center cursor-pointer"
         onClick={() => setIsExpanded(!isExpanded)}
       >
-        <h2 className="text-lg font-medium text-gray-900 dark:text-white">Methodology</h2>
+        <h2 className="text-lg font-medium text-gray-900 dark:text-white flex items-center">
+          Methodology
+          <InformationCircleIcon className="h-5 w-5 ml-2 text-primary-500 dark:text-primary-400" aria-hidden="true" />
+        </h2>
         <button className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
           {isExpanded ? (
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
