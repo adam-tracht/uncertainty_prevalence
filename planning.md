@@ -73,9 +73,12 @@ SciPy for statistical correlations
 
 Web Application:
 
-Flask or FastAPI for backend
-React for frontend
-Chart.js or D3.js for interactive visualizations
+FastAPI for backend API
+React 18 with TypeScript for frontend
+TailwindCSS for styling
+React Router for navigation
+Chart.js and D3.js for interactive visualizations (planned)
+Context API for state management (planned)
 
 
 Deployment: Static site for simplified hosting

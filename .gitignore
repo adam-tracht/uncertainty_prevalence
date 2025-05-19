@@ -20,6 +20,11 @@ wheels/
 .installed.cfg
 *.egg
 
+# Frontend
+frontend/node_modules/
+frontend/dist/
+frontend/.vite/
+
 # Virtual Environment
 venv/
 env/
@@ -37,10 +42,16 @@ ENV/
 !.env.example
 
 # Data files
-*.csv
-*.json
 *.db
 *.sqlite3
+
+# Don't ignore data output files that we need for visualization
+!/frontend/public/data/output/*.csv
+!/frontend/public/data/output/*.json
+
+# Don't ignore frontend files
+!/frontend/**/*.json
+!/frontend/**/*.csv
 
 # Logs
 logs/
