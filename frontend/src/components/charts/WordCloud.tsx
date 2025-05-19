@@ -131,10 +131,12 @@ const WordCloud: React.FC<WordCloudProps> = ({
     svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
     svg.setAttribute('preserveAspectRatio', 'xMidYMid meet'); // This helps with centering
     
-    // Set SVG styles
+    // Set SVG styles for better mobile display
     svg.style.display = 'block';
     svg.style.width = '100%';
     svg.style.height = '100%';
+    svg.style.maxWidth = '100%';
+    svg.style.maxHeight = '100%';
     
     // Position the SVG to fill the container
     svg.style.position = 'absolute';
@@ -143,18 +145,27 @@ const WordCloud: React.FC<WordCloudProps> = ({
     
     containerRef.current.appendChild(svg);
     
-    // Create group for centering the word cloud
+    // Create a group element for better organization
     const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-    g.setAttribute('transform', `translate(${width / 2},${height / 2})`);
+    
+    // Center the word cloud in the SVG
+    // For mobile, we want to ensure the cloud is properly centered and scaled
+    if (isMobile) {
+      // On mobile, use a slightly different transform to better fill the space
+      // Reduced scale to prevent overflow
+      g.setAttribute('transform', `translate(${width / 2},${height / 2}) scale(1.2)`);
+    } else {
+      g.setAttribute('transform', `translate(${width / 2},${height / 2})`);
+    }
+    
     svg.appendChild(g);
     
-    // Scale font size based on current dimensions
     // For smaller screens, reduce the max font size proportionally
     const scaleFactor = width / initialWidth;
     
     // Adjust min/max font sizes based on scale factor and device
     // Increase minimum font size on mobile for better readability
-    const adjustedMinFontSize = minFontSize * scaleFactor;
+    const adjustedMinFontSize = isMobile ? Math.max(minFontSize * scaleFactor, 14) : minFontSize * scaleFactor;
     // Increase maximum font size on mobile to make important words stand out more
     const adjustedMaxFontSize = maxFontSize * scaleFactor;
     
@@ -194,12 +205,18 @@ const WordCloud: React.FC<WordCloudProps> = ({
     }));
     
     // Create word cloud layout
+    // For mobile, use a slightly smaller size to prevent overflow
+    const layoutWidth = isMobile ? width * 0.85 : width;
+    const layoutHeight = isMobile ? height * 0.85 : height;
+    
     const layout = cloud<WordData>()
-      .size([width, height])
+      .size([layoutWidth, layoutHeight])
       .words(wordData)
       .padding(padding * scaleFactor) // Scale padding too
       .rotate(() => 0) // No rotation for better readability
       .fontSize(d => d.size)
+      // Use the full container size
+      .spiral('archimedean') // Better distribution for mobile
       .on('end', (words: WordData[]) => {
         // Draw the word cloud using plain DOM operations
         words.forEach((word, i) => {
