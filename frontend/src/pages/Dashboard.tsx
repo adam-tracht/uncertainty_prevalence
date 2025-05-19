@@ -74,13 +74,15 @@ const Dashboard = () => {
               Error loading data: {mentionsError.message}
             </div>
           ) : (
-            <TimeSeriesChart 
-              data={timeSeriesData} 
-              smoothingDays={smoothingDays}
-              onSmoothingChange={setSmoothingDays}
-              showSmoothingControl={true}
-              height={500}
-            />
+            <div className="pb-8 sm:pb-0"> {/* Add extra padding at the bottom on mobile */}
+              <TimeSeriesChart 
+                data={timeSeriesData} 
+                smoothingDays={smoothingDays}
+                onSmoothingChange={setSmoothingDays}
+                showSmoothingControl={true}
+                height={500}
+              />
+            </div>
           )}
         </div>
       </div>

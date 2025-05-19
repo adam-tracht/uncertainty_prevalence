@@ -113,18 +113,18 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
         ticks: {
           maxRotation: 45,
           minRotation: 45,
-          padding: 10, // Increased padding to prevent overflow
+          padding: 10,
+          // Use different settings for mobile and desktop
+          autoSkip: window.innerWidth < 640, // Only skip labels on mobile
+          maxTicksLimit: window.innerWidth < 640 ? 8 : undefined, // Limit ticks only on mobile
           font: {
-            size: () => {
-              // Use smaller font size on mobile devices
-              return window.innerWidth < 640 ? 10 : 12;
-            }
+            size: window.innerWidth < 640 ? 10 : 12 // Slightly smaller font on mobile
           }
         },
         // Add bottom padding to ensure labels don't overflow
         afterFit: (scale) => {
-          // Add more padding on mobile
-          scale.paddingBottom = window.innerWidth < 640 ? 25 : 15;
+          // More padding on mobile, less on desktop
+          scale.paddingBottom = window.innerWidth < 640 ? 35 : 15;
         },
       },
       y: {
@@ -169,8 +169,8 @@ const TimeSeriesChart: React.FC<TimeSeriesChartProps> = ({
     const handleResize = () => {
       // Check if we're on a mobile device (screen width < 640px, Tailwind's sm breakpoint)
       const isMobile = window.innerWidth < 640;
-      // Set height to 450px on mobile (increased from 400px), otherwise use the provided height
-      setChartHeight(isMobile ? Math.min(450, height) : height);
+      // Set height to 480px on mobile, otherwise use the provided height
+      setChartHeight(isMobile ? 480 : height);
     };
     
     // Set initial height
