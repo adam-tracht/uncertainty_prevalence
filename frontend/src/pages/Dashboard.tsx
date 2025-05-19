@@ -63,7 +63,7 @@ const Dashboard = () => {
       {/* Charts row */}
       <div className="grid grid-cols-1 gap-6">
         {/* Time series chart */}
-        <div className="card p-4">
+        <div className="card p-4 pb-8 sm:pb-4"> {/* Added extra bottom padding on mobile */}
           <h3 className="text-lg font-medium text-gray-700 dark:text-gray-300 mb-4">Uncertainty Mentions Over Time</h3>
           {mentionsLoading ? (
             <div className="h-64 flex items-center justify-center">
@@ -74,15 +74,13 @@ const Dashboard = () => {
               Error loading data: {mentionsError.message}
             </div>
           ) : (
-            <div className="pb-8 sm:pb-0"> {/* Add extra padding at the bottom on mobile */}
-              <TimeSeriesChart 
-                data={timeSeriesData} 
-                smoothingDays={smoothingDays}
-                onSmoothingChange={setSmoothingDays}
-                showSmoothingControl={true}
-                height={500}
-              />
-            </div>
+            <TimeSeriesChart 
+              data={timeSeriesData} 
+              smoothingDays={smoothingDays}
+              onSmoothingChange={setSmoothingDays}
+              showSmoothingControl={true}
+              height={500}
+            />
           )}
         </div>
       </div>
@@ -99,13 +97,12 @@ const Dashboard = () => {
             Error loading data: {wordCloudError.message}
           </div>
         ) : (
-          <div className="min-h-[500px] sm:min-h-[350px]">
-            <WordCloud 
-              data={wordCloudData} 
-              height={350}
-              minFrequency={5}
-            />
-          </div>
+          <WordCloud 
+            data={wordCloudData} 
+            height={350}
+            width={800} /* Explicitly set width for aspect ratio control */
+            minFrequency={5}
+          />
         )}
       </div>
 

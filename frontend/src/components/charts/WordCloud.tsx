@@ -54,22 +54,20 @@ const WordCloud: React.FC<WordCloudProps> = ({
       const parentWidth = containerRef.current.parentElement?.clientWidth || initialWidth;
       
       // Calculate responsive dimensions
+      // Use the parent width and maintain aspect ratio for height
       const newWidth = Math.min(parentWidth, initialWidth);
       
+      // For desktop (larger screens), use the initial height to ensure proper display
+      // For mobile (smaller screens), use a more square aspect ratio to improve readability
       let newHeight;
-      const isMobile = window.innerWidth < 640; // Tailwind's sm breakpoint
-      
-      if (isMobile) {
-        // On mobile, use a more portrait-oriented layout (taller)
-        // This makes the word cloud more readable on narrow screens
-        newHeight = Math.max(500, newWidth * 1.2); // Taller aspect ratio for mobile
-      } else if (parentWidth >= initialWidth) {
-        // On desktop with full width, use the initial height
+      if (parentWidth >= initialWidth) {
+        // On desktop, use the full height
         newHeight = initialHeight;
       } else {
-        // On tablets or smaller desktop screens, scale proportionally
-        const aspectRatio = initialHeight / initialWidth;
-        newHeight = newWidth * aspectRatio;
+        // On mobile, use a more square aspect ratio (less wide, more tall)
+        // This makes the word cloud more readable on narrow screens
+        const mobileAspectRatio = 0.8; // Closer to square than the default landscape ratio
+        newHeight = Math.max(newWidth * mobileAspectRatio, 400); // Ensure minimum height of 400px
       }
       
       setDimensions({ width: newWidth, height: newHeight });
@@ -89,10 +87,24 @@ const WordCloud: React.FC<WordCloudProps> = ({
   useEffect(() => {
     if (isLoading || !containerRef.current) return;
     
+    // Determine if we're on mobile based on container width
+    const isMobile = dimensions.width < 640; // Using Tailwind's sm breakpoint
+    
+    // Use a higher minimum frequency threshold on mobile to show fewer words
+    const effectiveMinFrequency = minFrequency;
+    
+    // Limit the number of words on mobile to prevent overcrowding
+    const maxWordsOnMobile = 150;
+    
     // Filter data based on minimum frequency and excluded terms
-    const filteredData = data
-      .filter(item => item.value >= minFrequency)
+    let filteredData = data
+      .filter(item => item.value >= effectiveMinFrequency)
       .filter(item => !excludeTerms.includes(item.text.toLowerCase()));
+      
+    // Further limit the number of words on mobile
+    if (isMobile && filteredData.length > maxWordsOnMobile) {
+      filteredData = filteredData.slice(0, maxWordsOnMobile);
+    }
     
     if (filteredData.length === 0) return;
     
@@ -138,17 +150,35 @@ const WordCloud: React.FC<WordCloudProps> = ({
     
     // Scale font size based on current dimensions
     // For smaller screens, reduce the max font size proportionally
-    const scaleFactor = Math.min(width / initialWidth, 1);
-    const adjustedMaxFontSize = maxFontSize * scaleFactor;
-    const adjustedMinFontSize = Math.max(minFontSize * scaleFactor, 8); // Don't go below 8px
+    const scaleFactor = width / initialWidth;
     
-    // Create scale for font size
+    // Adjust min/max font sizes based on scale factor and device
+    // Increase minimum font size on mobile for better readability
+    const adjustedMinFontSize = minFontSize * scaleFactor;
+    // Increase maximum font size on mobile to make important words stand out more
+    const adjustedMaxFontSize = maxFontSize * scaleFactor;
+    
+    // Font size scale
     const fontSizeScale = d3.scaleLinear<number>()
       .domain([
-        d3.min(filteredData, d => d.value) || minFrequency,
-        d3.max(filteredData, d => d.value) || minFrequency
+        d3.min(filteredData, d => d.value) || 0,
+        d3.max(filteredData, d => d.value) || 1
       ])
       .range([adjustedMinFontSize, adjustedMaxFontSize]);
+      
+    // Use a more aggressive scaling on mobile to create more distinction between important and less important words
+    if (isMobile) {
+      // Apply a power scale to create more separation between small and large words
+      const powerScale = 1.25; // Higher values create more distinction
+      fontSizeScale.range([adjustedMinFontSize, adjustedMaxFontSize])
+        .interpolate((a, b) => {
+          return (t) => {
+            // Apply power scaling to create more visual hierarchy
+            const scaledT = Math.pow(t, powerScale);
+            return a * (1 - scaledT) + b * scaledT;
+          };
+        });
+    }
     
     // Color scale
     const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
@@ -257,10 +287,9 @@ const WordCloud: React.FC<WordCloudProps> = ({
       ref={containerRef} 
       className="relative w-full" 
       style={{
-        // Set explicit height based on calculated dimensions
+        // Always use the calculated height to ensure proper sizing
         height: `${dimensions.height}px`,
-        // Add min-height to prevent collapse during loading
-        minHeight: window.innerWidth < 640 ? '500px' : '384px'
+        minHeight: '400px' // Ensure a minimum height on all devices
       }}
     />
   );
