@@ -54,17 +54,20 @@ const WordCloud: React.FC<WordCloudProps> = ({
       const parentWidth = containerRef.current.parentElement?.clientWidth || initialWidth;
       
       // Calculate responsive dimensions
-      // Use the parent width and maintain aspect ratio for height
       const newWidth = Math.min(parentWidth, initialWidth);
       
-      // For desktop (larger screens), use the initial height to ensure proper display
-      // For mobile (smaller screens), scale the height proportionally
       let newHeight;
-      if (parentWidth >= initialWidth) {
-        // On desktop, use the full height
+      const isMobile = window.innerWidth < 640; // Tailwind's sm breakpoint
+      
+      if (isMobile) {
+        // On mobile, use a more portrait-oriented layout (taller)
+        // This makes the word cloud more readable on narrow screens
+        newHeight = Math.max(500, newWidth * 1.2); // Taller aspect ratio for mobile
+      } else if (parentWidth >= initialWidth) {
+        // On desktop with full width, use the initial height
         newHeight = initialHeight;
       } else {
-        // On mobile, scale height proportionally
+        // On tablets or smaller desktop screens, scale proportionally
         const aspectRatio = initialHeight / initialWidth;
         newHeight = newWidth * aspectRatio;
       }
@@ -252,10 +255,12 @@ const WordCloud: React.FC<WordCloudProps> = ({
   return (
     <div 
       ref={containerRef} 
-      className="relative w-full h-96" // Use Tailwind's h-96 class (384px) for consistent height
+      className="relative w-full" 
       style={{
-        // Only override the height on smaller screens
-        ...(dimensions.width < initialWidth && { height: dimensions.height })
+        // Set explicit height based on calculated dimensions
+        height: `${dimensions.height}px`,
+        // Add min-height to prevent collapse during loading
+        minHeight: window.innerWidth < 640 ? '500px' : '384px'
       }}
     />
   );

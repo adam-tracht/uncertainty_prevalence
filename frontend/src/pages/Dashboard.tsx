@@ -97,11 +97,13 @@ const Dashboard = () => {
             Error loading data: {wordCloudError.message}
           </div>
         ) : (
-          <WordCloud 
-            data={wordCloudData} 
-            height={350}
-            minFrequency={5}
-          />
+          <div className="min-h-[500px] sm:min-h-[350px]">
+            <WordCloud 
+              data={wordCloudData} 
+              height={350}
+              minFrequency={5}
+            />
+          </div>
         )}
       </div>
 
